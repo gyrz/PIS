@@ -1,0 +1,97 @@
+﻿@model IEnumerable<PIS.Models.Order>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor( model => model.strOrderNumber )
+            </th>
+            <th>
+                @Html.DisplayNameFor( model => model.strOrderKey )
+            </th>
+            <th>
+                @Html.DisplayNameFor( model => model.eStatus )
+            </th>
+            <th>
+                @Html.DisplayNameFor( model => model.ePayment )
+            </th>
+            <th>
+                @Html.DisplayNameFor( model => model.strRemarks )
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach( var item in Model )
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor( modelItem => item.strOrderNumber )
+                </td>
+                <td>
+                    @Html.DisplayFor( modelItem => item.strOrderKey )
+                </td>
+                <td>
+                    @PIS.Models.EnumResourceManager.GetDisplayName( item.eStatus )
+                </td>
+                <td>
+                    @PIS.Models.EnumResourceManager.GetDisplayName( item.ePayment )
+                </td>
+                <td>
+                    @Html.DisplayFor( modelItem => item.strRemarks )
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">@PIS.Properties.Resource.Edit</a> |
+                    <a asp-action="AddItem" asp-route-id="@item.Id">@PIS.Properties.Resource.Add</a>
+                </td>
+            </tr>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>
+                            @Html.DisplayNameFor( model => new OrderItem().dQuantity )
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor( model => new OrderItem().Material.DefaultUnitPrice )
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor( model => new OrderItem().Material.strName )
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor( model => new OrderItem().Material.strDescription )
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor( model => new OrderItem().strRemarks )
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach( var itemInner in item.listOrderItem )
+                    {
+                    <tr>
+                        <td>
+                            @itemInner.dQuantity  @itemInner.Material.PrimaryUnit.strAbbrev
+                        </td>
+                        <td>
+                            @itemInner.Material.DefaultUnitPrice.nPrice @itemInner.Material.DefaultUnitPrice.Currency.strAbbrev
+                        </td>
+                        <td>
+                            @Html.DisplayFor( modelItem => itemInner.Material.strName )
+                        </td>
+                        <td>
+                            @Html.DisplayFor( modelItem => itemInner.Material.strDescription )
+                        </td>
+                        <td>
+                            @Html.DisplayFor( modelItem => itemInner.strRemarks )
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </tbody>
+</table>
