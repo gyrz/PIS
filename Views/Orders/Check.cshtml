@@ -1,0 +1,27 @@
+﻿@model PIS.Models.Order
+
+@{
+    ViewData["Title"] = "Check";
+}
+
+<h1></h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Check">
+            <div class="form-group">
+                <label asp-for="strOrderKey" class="control-label"></label>
+                <input asp-for="strOrderKey" CssClass="form-control" />
+                <span asp-validation-for="strOrderKey" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="@PIS.Properties.Resource.Search" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync( "_ValidationScriptsPartial" );}
+}
