@@ -49,6 +49,16 @@
                     <a asp-action="AddItem" asp-route-id="@item.Id">@PIS.Properties.Resource.Add</a>
                 </td>
             </tr>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor( modelItem => item.MailingAddress )
+                </th>
+            </tr>
+            <tr>
+                <td>
+                    @item.MailingAddress.GetAddress()
+                </td>
+            </tr>
             <table class="table">
                 <thead>
                     <tr>
@@ -72,26 +82,26 @@
                 <tbody>
                     @foreach( var itemInner in item.listOrderItem )
                     {
-                    <tr>
-                        <td>
-                            @itemInner.dQuantity  @itemInner.Material.PrimaryUnit.strAbbrev
-                        </td>
-                        <td>
-                            @itemInner.Material.DefaultUnitPrice.nPrice @itemInner.Material.DefaultUnitPrice.Currency.strAbbrev
-                        </td>
-                        <td>
-                            @Html.DisplayFor( modelItem => itemInner.Material.strName )
-                        </td>
-                        <td>
-                            @Html.DisplayFor( modelItem => itemInner.Material.strDescription )
-                        </td>
-                        <td>
-                            @Html.DisplayFor( modelItem => itemInner.strRemarks )
-                        </td>
-                    </tr>
+                        <tr>
+                            <td>
+                                @itemInner.dQuantity  @itemInner.Material.PrimaryUnit.strAbbrev
+                            </td>
+                            <td>
+                                @itemInner.Material.DefaultUnitPrice.nPrice @itemInner.Material.DefaultUnitPrice.Currency.strAbbrev
+                            </td>
+                            <td>
+                                @Html.DisplayFor( modelItem => itemInner.Material.strName )
+                            </td>
+                            <td>
+                                @Html.DisplayFor( modelItem => itemInner.Material.strDescription )
+                            </td>
+                            <td>
+                                @Html.DisplayFor( modelItem => itemInner.strRemarks )
+                            </td>
+                        </tr>
                     }
                 </tbody>
             </table>
-        }
-    </tbody>
-</table>
+            }
+        </tbody>
+    </table>

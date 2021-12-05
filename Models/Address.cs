@@ -39,5 +39,15 @@ namespace PIS.Models
 			strHouseNumber = string.Empty;
 		}
 
+
+		public string GetAddress()
+		{
+			return strCountry + "\n" + strPostCode + " " + strCity + ",\n" + strPlaceName + " " + EnumResourceManager.GetDisplayName( ePublicPlace ) + " " + strHouseNumber;
+		}
+
+		public string GetAddressLine()
+		{
+			return strCountry + " " + strPostCode + " " + strCity + ", " + strPlaceName + " " + EnumResourceManager.GetDisplayName( ePublicPlace ) + " " + strHouseNumber;
+		}
 	}
 }

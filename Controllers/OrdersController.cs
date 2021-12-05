@@ -45,12 +45,16 @@ namespace PIS.Controllers
 		[Authorize]
 		public IActionResult Create()
         {
+			List<SelectListItem> listItems = new List<SelectListItem>();
+			foreach( var itm in _context.Address )
+				listItems.Add( new SelectListItem { Text = itm.GetAddressLine(), Value = itm.Id.ToString() } );
+
+			ViewBag.MailingAddress = _context.Address.Select( c => new SelectListItem() { Text = c.GetAddressLine(), Value = c.Id.ToString() } ).ToList();
+
 			return View();
         }
 
 		// POST: Orders/Create
-		// To protect from overposting attacks, enable the specific properties you want to bind to.
-		// For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
 		[HttpPost]
         [ValidateAntiForgeryToken]
 		[Authorize]
@@ -58,8 +62,26 @@ namespace PIS.Controllers
         {
             if (ModelState.IsValid)
             {
+				string _strAddressId = HttpContext.Request.Form["MailingAddress"];
+				Address _address = await _context.Address.FirstOrDefaultAsync(m => m.Id == Int64.Parse( _strAddressId ));
+				if( _address == null )
+					return NotFound();
+
+				order.MailingAddress = _address;
+				order.BillingAddress = _address;
+
 				var userId =  User.FindFirstValue(ClaimTypes.Name);
-				order.strOrderKey = OrderNumberGenerator.GenerateRandomOrderNumber();
+				while(true)
+				{
+					string _strOrderKey = OrderNumberGenerator.GenerateRandomOrderNumber();
+					if( _context.Order.Where( m =>	m.strOrderKey   == _strOrderKey &&
+													m.User          != null         &&
+													m.User.UserName == userId        ).Count() == 0 )
+					{
+						order.strOrderKey = _strOrderKey;
+						break;
+					}
+				}
 				order.User = await _context.Users.FirstAsync( m => m.UserName == userId );
 				_context.Add(order);
                 await _context.SaveChangesAsync();
@@ -86,12 +108,17 @@ namespace PIS.Controllers
             {
                 return NotFound();
             }
-            return View(order);
+
+			List<SelectListItem> listItems = new List<SelectListItem>();
+			foreach( var itm in _context.Address )
+				listItems.Add( new SelectListItem { Text = itm.GetAddressLine(), Value = itm.Id.ToString() } );
+
+			ViewBag.MailingAddress = _context.Address.Select( c => new SelectListItem() { Text = c.GetAddressLine(), Value = c.Id.ToString() } ).ToList();
+
+			return View(order);
         }
 
         // POST: Orders/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
 		[Authorize]
@@ -102,11 +129,19 @@ namespace PIS.Controllers
                 return NotFound();
             }
 
-			if (ModelState.IsValid)
+			if( ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(order);
+					string _strAddressId = HttpContext.Request.Form["MailingAddress"];
+					Address _address = await _context.Address.FirstOrDefaultAsync(m => m.Id == Int64.Parse( _strAddressId ));
+					if( _address == null )
+						return NotFound();
+
+					order.MailingAddress = _address;
+					order.BillingAddress = _address;
+
+					_context.Update(order);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -121,7 +156,6 @@ namespace PIS.Controllers
                     }
                 }
 				var userId =  User.FindFirstValue(ClaimTypes.Name);
-
 				ReloadOrderRefs( order );
 
 				return View( "Index", _context.Order.Where( m =>
@@ -221,7 +255,6 @@ namespace PIS.Controllers
 			}
 
 			string _strMaterialId = HttpContext.Request.Form["Material"];
-
 			Material _material = await _context.Material.FirstOrDefaultAsync(m => m.Id == Int64.Parse( _strMaterialId ));
 
 			long _OrderId = Int64.Parse( GetCookie( "OrderId" ) );
@@ -271,7 +304,9 @@ namespace PIS.Controllers
 
 		private void ReloadOrderRefs( Order order )
 		{
+			//_context.OrderItem.Where( p => p.Order == order ).Load();
 			_context.Entry( order ).Collection( s => s.listOrderItem ).Load();
+			_context.Entry( order ).Reference( s => s.MailingAddress ).Load();
 
 			foreach( var _item in order.listOrderItem )
 			{

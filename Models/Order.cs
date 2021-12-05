@@ -26,6 +26,7 @@ namespace PIS.Models
 			PT_CASH
 		}
 
+		[Required]
 		[Display( Name = "OrderNumber", ResourceType = typeof( Resource ) )]
 		public string          strOrderNumber { get; set; }
 		[Display( Name = "User", ResourceType = typeof( Resource ) )]
