@@ -31,8 +31,7 @@ namespace PIS.Controllers
                 return NotFound();
             }
 
-            var order = await _context.Order
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var order = await _context.Order.FirstOrDefaultAsync(m => m.Id == id);
             if (order == null)
             {
                 return NotFound();
@@ -49,7 +48,9 @@ namespace PIS.Controllers
 			foreach( var itm in _context.Address )
 				listItems.Add( new SelectListItem { Text = itm.GetAddressLine(), Value = itm.Id.ToString() } );
 
-			ViewBag.MailingAddress = _context.Address.Select( c => new SelectListItem() { Text = c.GetAddressLine(), Value = c.Id.ToString() } ).ToList();
+			ViewBag.MailingAddress = _context.Address
+												.Select( c => new SelectListItem() {	Text = c.GetAddressLine(), 
+																						Value = c.Id.ToString() } ).ToList();
 
 			return View();
         }
@@ -85,7 +86,7 @@ namespace PIS.Controllers
 				order.User = await _context.Users.FirstAsync( m => m.UserName == userId );
 				_context.Add(order);
                 await _context.SaveChangesAsync();
-				ReloadOrderRefs( order );
+				reloadOrderRefs( order );
 				return View( "Index", _context.Order.Where( m =>
 															m.strOrderKey   == order.strOrderKey &&
 															m.User          != null              &&
@@ -156,12 +157,11 @@ namespace PIS.Controllers
                     }
                 }
 				var userId =  User.FindFirstValue(ClaimTypes.Name);
-				ReloadOrderRefs( order );
+				reloadOrderRefs( order );
 
-				return View( "Index", _context.Order.Where( m =>
-				m.strOrderKey   == strOrderKey &&
-				m.User          != null        &&
-				m.User.UserName == userId       ) );
+				return View( "Index", _context.Order.Where( m =>	m.strOrderKey   == strOrderKey &&
+																	m.User          != null        &&
+																	m.User.UserName == userId       ) );
 			}
             return View(order);
         }
@@ -220,17 +220,16 @@ namespace PIS.Controllers
 
 			var userId =  User.FindFirstValue(ClaimTypes.Name);
 
-			var order = await _context.Order.FirstOrDefaultAsync(m => 
-				m.strOrderKey   == strOrderKey && 
-				m.User          != null        &&
-				m.User.UserName == userId       );
+			var order = await _context.Order.FirstOrDefaultAsync(m =>	m.strOrderKey   == strOrderKey && 
+																		m.User          != null        &&
+																		m.User.UserName == userId       );
 
 			if( order == null )
 			{
 				return RedirectToAction( nameof( Check ) );
 			}
 
-			ReloadOrderRefs( order );
+			reloadOrderRefs( order );
 
 			return View( "Index", _context.Order.Where( m => 
 				m.strOrderKey   == strOrderKey && 
@@ -274,12 +273,11 @@ namespace PIS.Controllers
 
 				var userId =  User.FindFirstValue(ClaimTypes.Name);
 
-				ReloadOrderRefs( _order );
+				reloadOrderRefs( _order );
 
-				return View( "Index", _context.Order.Where( m => 
-				m.strOrderKey   == _order.strOrderKey && 
-				m.User          != null               &&
-				m.User.UserName == userId              ) );
+				return View( "Index", _context.Order.Where( m =>	m.strOrderKey   == _order.strOrderKey && 
+																	m.User          != null               &&
+																	m.User.UserName == userId              ) );
 			}
 
 			return View();
@@ -302,7 +300,7 @@ namespace PIS.Controllers
 			return View( "CreateOrderItem" );
 		}
 
-		private void ReloadOrderRefs( Order order )
+		private void reloadOrderRefs( Order order )
 		{
 			//_context.OrderItem.Where( p => p.Order == order ).Load();
 			_context.Entry( order ).Collection( s => s.listOrderItem ).Load();

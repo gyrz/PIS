@@ -24,18 +24,18 @@ namespace PIS.Models
 			{
 				long ticks = DateTime.Now.Ticks;
 				hash = Int32.Parse( ticks.ToString().Substring( 10 ) );
+
+				Random rnd = new Random(hash);
+				for (int iPos = 0; iPos < 4; iPos++)
+					strReturn += _arrChars[rnd.Next(0, _arrChars.Count())];
+
+				for (int iPos = 0; iPos < 4; iPos++)
+					strReturn += rnd.Next(0, 9);
 			}
 			catch( FormatException e )
 			{
 				Console.WriteLine( e.Message );
 			}
-
-			Random rnd = new Random( hash );
-			for( int iPos = 0; iPos < 4; iPos++ )
-				strReturn += _arrChars[ rnd.Next( 0, _arrChars.Count() ) ];
-
-			for( int iPos = 0; iPos < 4; iPos++ )
-				strReturn += rnd.Next( 0, 9 );
 
 			return strReturn;
 		}
